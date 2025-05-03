@@ -1,15 +1,8 @@
 ![image](https://github.com/thetibiaking/ttk--forgottenserver/assets/74227915/8303942e-3315-4ff5-bb3e-9570fccd1817)
 
-
 # Projeto Tibia Server (TFS)
-
-Este repositório contém diferentes versões do servidor de jogo Tibia desenvolvidas com a The Forgotten Server (TFS). Cada branch corresponde a uma versão específica do TFS e possui seu próprio arquivo README com informações e recursos relacionados.
-
 ## Branches Disponíveis
-
 - **TFS-1x**: Versões do TFS para Tibia 10.98 -> Custom Login VIA WebSocket Client 14+ Compativel OTCv8 Ready.
-
-A branch master sempre contém a versão mais atualizada do TFS compatível com a versão mais recente do Tibia.
 
 ## Sobre o Projeto
 
