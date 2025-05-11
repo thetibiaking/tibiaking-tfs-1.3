@@ -2,7 +2,7 @@
 
 # Projeto Tibia Server (TFS)
 ## Branches Disponíveis
-- **TFS-1x**: Versões do TFS para Tibia 10.98 -> Custom Login VIA WebSocket Client 14+ Compativel OTCv8 Ready.
+- **TFS-1x**: Versões do TFS para Tibia 10.98 -> Custom Login VIA WebSocket Compativel OTCv8 Ready.
 
 ## Sobre o Projeto
 
