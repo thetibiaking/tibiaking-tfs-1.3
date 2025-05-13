@@ -1,6 +1,8 @@
 /**
+ * @file lockfree.h
+ * 
  * The Forgotten Server - a free and open-source MMORPG server emulator
- * Copyright (C) 2019  Mark Samman <mark.samman@gmail.com>
+ * Copyright (C) 2020 Mark Samman <mark.samman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef FS_LOCKFREE_H_8C707AEB7C7235A2FBC5D4EDDF03B008
-#define FS_LOCKFREE_H_8C707AEB7C7235A2FBC5D4EDDF03B008
+#ifndef OT_SRC_LOCKFREE_H_
+#define OT_SRC_LOCKFREE_H_
 
 #if _MSC_FULL_VER >= 190023918 // Workaround for VS2015 Update 2. Boost.Lockfree is a header-only library, so this should be safe to do.
 #define _ENABLE_ATOMIC_ALIGNMENT_FIX
@@ -47,31 +49,39 @@ struct LockfreeFreeList
 template <typename T, size_t CAPACITY>
 class LockfreePoolingAllocator : public std::allocator<T>
 {
-	public:
-		LockfreePoolingAllocator() = default;
+public:
+    using value_type = T;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using void_pointer = void*;
+    using const_void_pointer = const void*;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
-		template <typename U, class = typename std::enable_if<!std::is_same<U, T>::value>::type>
-		explicit constexpr LockfreePoolingAllocator(const U&) {}
-		using value_type = T;
+    LockfreePoolingAllocator() noexcept = default;
+    template <typename U>
+    LockfreePoolingAllocator(const LockfreePoolingAllocator<U, CAPACITY>&) noexcept {}
 
-		T* allocate(size_t) const {
-			auto& inst = LockfreeFreeList<sizeof(T), CAPACITY>::get();
-			void* p; // NOTE: p doesn't have to be initialized
-			if (!inst.pop(p)) {
-				//Acquire memory without calling the constructor of T
-				p = operator new (sizeof(T));
-			}
-			return static_cast<T*>(p);
-		}
+    template <typename U>
+    struct rebind {
+        using other = LockfreePoolingAllocator<U, CAPACITY>;
+    };
 
-		void deallocate(T* p, size_t) const {
-			auto& inst = LockfreeFreeList<sizeof(T), CAPACITY>::get();
-			if (!inst.bounded_push(p)) {
-				//Release memory without calling the destructor of T
-				//(it has already been called at this point)
-				operator delete(p);
-			}
-		}
+    T* allocate(size_t) const {
+        auto& inst = LockfreeFreeList<sizeof(T), CAPACITY>::get();
+        void* p;
+        if (!inst.pop(p)) {
+            p = operator new (sizeof(T));
+        }
+        return static_cast<T*>(p);
+    }
+
+    void deallocate(T* p, size_t) const {
+        auto& inst = LockfreeFreeList<sizeof(T), CAPACITY>::get();
+        if (!inst.bounded_push(p)) {
+            operator delete(p);
+        }
+    }
 };
 
 #endif
